@@ -1,6 +1,6 @@
-using Models.Enums;
+using Api.Models.Enums;
 
-namespace Models;
+namespace Api.Models;
 
 public class Patient : User
 {

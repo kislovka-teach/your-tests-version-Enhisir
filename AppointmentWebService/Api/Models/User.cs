@@ -1,6 +1,5 @@
-using Models.Enums;
-
-namespace Models;
+using Api.Models.Enums;
+namespace Api.Models;
 
 public class User
 {
