@@ -1,7 +1,9 @@
 namespace Api.Models;
 
-public class Appointment
+public class Visit
 {
+    public int Id { get; set; }
+    
     public DateTime Date { get; set; }
     
     public int DoctorId { get; set; }
@@ -9,4 +11,6 @@ public class Appointment
     
     public int PatientId { get; set; }
     public Doctor Patient { get; set; }
+    
+    public Review? Review { get; set; }
 }
