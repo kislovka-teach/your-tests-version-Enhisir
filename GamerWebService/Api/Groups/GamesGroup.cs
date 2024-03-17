@@ -13,6 +13,7 @@ public static class GamesGroup
     {
         group.MapGet("", GetGames);
         group.MapPost("", AddGame).AddEndpointFilter<AdminEndpointFilter>();
+        group.MapGet("{gameId:int}", GetConcreteGame);
         group.MapPost("{gameId:int}/note", AddGameNote).AddEndpointFilter<AuthEndpointFilter>();
 
         return group;
