@@ -19,5 +19,11 @@ public sealed class ApplicationContext : DbContext
         modelBuilder
             .Entity<User>()
             .HasKey(e => e.UserName);
+        
+        modelBuilder
+            .Entity<Visit>()
+            .HasOne<Patient>()
+            .WithMany()
+            .HasForeignKey(v => v.PatientId);
     }
 }
