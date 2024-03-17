@@ -90,6 +90,12 @@ public static class PatientsGroup
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             return;
         }
+        
+        if (visit.Date.Date.Equals(DateTime.Today))
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
 
         visit.IsSuccessful = true;
         visit.Finding = dto.Finding;
