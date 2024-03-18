@@ -5,7 +5,7 @@ namespace Api.Services;
 
 public class PlayerRepository(ApplicationContext dbContext) : IPlayerRepository
 {
-    public async Task<Player?> GetConcretePlayer(string username)
+    public async Task<Player?> GetConcretePlayerAsync(string username)
         => await dbContext.Players
             .SingleOrDefaultAsync(e => username.Equals(e.UserName));
     

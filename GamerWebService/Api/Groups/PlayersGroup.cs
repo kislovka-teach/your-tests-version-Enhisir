@@ -4,7 +4,7 @@ namespace Api.Groups;
 
 public static class PlayersGroup
 {
-    public static RouteGroupBuilder MapGames(this RouteGroupBuilder group)
+    public static RouteGroupBuilder MapPlayers(this RouteGroupBuilder group)
     {
         group.MapGet("{username}", GetPlayer);
         group.MapGet("{username}/games", GetGames);
@@ -17,7 +17,7 @@ public static class PlayersGroup
         string username,
         IPlayerRepository playerRepository)
     {
-        var player = await playerRepository.GetConcretePlayer(username);
+        var player = await playerRepository.GetConcretePlayerAsync(username);
 
         if (player is null)
         {
@@ -35,7 +35,7 @@ public static class PlayersGroup
         IPlayerRepository playerRepository,
         IGameNoteRepository gameNoteRepository)
     {
-        var player = await playerRepository.GetConcretePlayer(username);
+        var player = await playerRepository.GetConcretePlayerAsync(username);
 
         if (player is null)
         {

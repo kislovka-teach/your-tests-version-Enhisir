@@ -8,7 +8,7 @@ namespace Api.Groups;
 
 public static class CompaniesGroup
 {
-    public static RouteGroupBuilder MapGames(this RouteGroupBuilder group)
+    public static RouteGroupBuilder MapCompanies(this RouteGroupBuilder group)
     {
         group.MapPost("", AddCompany).AddEndpointFilter<AdminEndpointFilter>();
 

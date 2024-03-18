@@ -1,13 +1,78 @@
+using System.IdentityModel.Tokens.Jwt;
+using Api;
+using Api.Dtos;
+using Api.Groups;
+using Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services
+    .AddDbContext<ApplicationContext>(optionsBuilder => 
+        optionsBuilder.UseNpgsql(
+            builder.Configuration
+                .GetConnectionString("GamerWebService")));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = AuthOptions.Issuer,
+
+        ValidateAudience = true,
+        ValidAudience = AuthOptions.Audience,
+
+        ValidateLifetime = true,
+
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = AuthOptions.SecurityKey
+    };
+});
+
+builder.Services
+    .AddScoped<ICompanyRepository, CompanyRepository>()
+    .AddScoped<IGameRepository, GameRepository>()
+    .AddScoped<IGameNoteRepository, GameNoteRepository>()
+    .AddScoped<IPlayerRepository, PlayerRepository>()
+    .AddScoped<IValidateLoginService, ValidateLoginService>()
+    .AddScoped<IPasswordHasherService, PasswordHasherService>()
+    .AddScoped<IJwtTokenService, JwtTokenService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.MapPost(
+    "/login", 
+    async ([FromBody] LoginDto dto, 
+        IValidateLoginService validateLoginService,
+        IJwtTokenService jwtTokenService) =>
+    {
+        var player = await validateLoginService
+            .ValidateLoginAsync(dto.UserName, dto.Password);
+        if (player is null)
+            return Results.Unauthorized();
+
+        var jwt = jwtTokenService.GetJwtSecurityToken(player.UserName, player.Role);
+
+        return Results.Ok(new { token = new JwtSecurityTokenHandler().WriteToken(jwt) });
+    });
+
+app.MapGroup("games").MapGames();
+app.MapGroup("companies").MapCompanies();
+app.MapGroup("players").MapPlayers();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +81,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
