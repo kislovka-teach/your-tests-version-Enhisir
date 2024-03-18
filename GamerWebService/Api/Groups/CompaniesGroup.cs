@@ -24,7 +24,6 @@ public static class CompaniesGroup
         var company = mapper.Map<Company>(dto);
         companyRepository.AddCompany(company);
         
-        context.Response.StatusCode = StatusCodes.Status200OK;
         return Task.CompletedTask;
     }
 }

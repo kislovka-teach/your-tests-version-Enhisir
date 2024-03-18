@@ -11,7 +11,7 @@ public class ValidateLoginService(
         var player = await userService.GetConcretePlayerAsync(username);
         
         if (player is null 
-            || passwordHasherService
+            || !passwordHasherService
                 .Validate(player.PasswordHashed, password))
             return null;
         

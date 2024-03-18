@@ -79,7 +79,6 @@ public static class GamesGroup
 
         var game = mapper.Map<Game>(dto);
         gameRepository.AddGame(game);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
     
     private static async Task AddGameNote(
@@ -98,9 +97,14 @@ public static class GamesGroup
             return;
         }
 
+        if (game.Id == gameId)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
         var gameNote = mapper.Map<GameNote>(dto);
         gameNote.PlayerId = username.Value;
         gameNoteRepository.AddGameNote(gameNote);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 }

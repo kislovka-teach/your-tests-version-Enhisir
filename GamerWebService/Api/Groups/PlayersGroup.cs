@@ -26,7 +26,6 @@ public static class PlayersGroup
         }
 
         await context.Response.WriteAsJsonAsync(player);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 
     private static async Task GetGames(
@@ -49,7 +48,6 @@ public static class PlayersGroup
             .Select(e => e.Game);
 
         await context.Response.WriteAsJsonAsync(games);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
     
     private static async Task GetGameNote(
@@ -67,6 +65,5 @@ public static class PlayersGroup
         }
         
         await context.Response.WriteAsJsonAsync(gameNote);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 }

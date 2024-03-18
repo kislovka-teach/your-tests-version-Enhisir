@@ -7,7 +7,7 @@ public class AuthEndpointFilter : IEndpointFilter
         EndpointFilterDelegate next)
     {
         var identity = context.HttpContext.User.Identity;
-        return identity is null || identity.IsAuthenticated
+        return identity is null || !identity.IsAuthenticated
             ? Results.Unauthorized() 
             : await next(context);
     }

@@ -2,10 +2,12 @@ using System.IdentityModel.Tokens.Jwt;
 using Api;
 using Api.Dtos;
 using Api.Groups;
+using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,18 +61,23 @@ var app = builder.Build();
 
 app.MapPost(
     "/login", 
-    async ([FromBody] LoginDto dto, 
+    async (HttpContext context,
+        [FromBody] LoginDto dto, 
         IValidateLoginService validateLoginService,
         IJwtTokenService jwtTokenService) =>
     {
         var player = await validateLoginService
             .ValidateLoginAsync(dto.UserName, dto.Password);
         if (player is null)
-            return Results.Unauthorized();
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
+        }
 
         var jwt = jwtTokenService.GetJwtSecurityToken(player.UserName, player.Role);
-
-        return Results.Ok(new { token = new JwtSecurityTokenHandler().WriteToken(jwt) });
+        var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+        context.Response.Headers.Add(new KeyValuePair<string, StringValues>("Authorization",  "Bearer " + token));
+        context.Response.StatusCode = StatusCodes.Status200OK;
     });
 
 app.MapGroup("games").MapGames();
