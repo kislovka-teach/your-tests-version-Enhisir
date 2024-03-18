@@ -1,4 +1,5 @@
 using Api.Models;
+using Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api;
@@ -25,5 +26,49 @@ public sealed class ApplicationContext : DbContext
             .HasOne<Patient>()
             .WithMany()
             .HasForeignKey(v => v.PatientId);
+
+        var passwordHasher = new PasswordHasherService();
+        modelBuilder
+            .Entity<Patient>()
+            .HasData(
+                new Patient()
+                {
+                    Name = "m", 
+                    Surname = "s",
+                    UserName = "enhisir", 
+                    PasswordHashed = passwordHasher.Hash("enhisir")
+                },
+                new Patient()
+                {
+                    Name = "n",
+                    Surname = "i",
+                    UserName = "nikoimam",
+                    PasswordHashed = passwordHasher.Hash("nikoimam")
+                });
+
+        modelBuilder.Entity<Specialization>().HasData(
+            new Specialization() { Id = 1, Name = "Handsome master" }
+            );
+
+        modelBuilder.Entity<Doctor>().HasData(
+            new Doctor()
+            {
+                SpecializationId = 1, 
+                Name = "Johnny", 
+                Surname = "Sins", 
+                UserName = "bold", 
+                PasswordHashed = passwordHasher.Hash("bold")
+            });
+
+        modelBuilder.Entity<Visit>().HasData(
+            new Visit()
+            {
+                Id = 1, 
+                PatientId = "enhisir", 
+                DoctorId = "bold", 
+                Date = DateTime.Today.ToUniversalTime(), 
+                Finding = "pomer..."
+            }
+        );
     }
 }
