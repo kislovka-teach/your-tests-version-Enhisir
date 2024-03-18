@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = AuthOptions.SecurityKey
     };
 });
+builder.Services.AddAuthorization();
 
 builder.Services
     .AddScoped<ICompanyRepository, CompanyRepository>()
@@ -50,6 +51,9 @@ builder.Services
     .AddScoped<IValidateLoginService, ValidateLoginService>()
     .AddScoped<IPasswordHasherService, PasswordHasherService>()
     .AddScoped<IJwtTokenService, JwtTokenService>();
+
+builder.Services.AddAutoMapper(
+    options => options.AddProfile<MapperProfile>());
 
 var app = builder.Build();
 
