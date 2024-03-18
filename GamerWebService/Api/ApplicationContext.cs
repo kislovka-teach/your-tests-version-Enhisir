@@ -42,8 +42,6 @@ public sealed class ApplicationContext : DbContext
 
         modelBuilder.Entity<Company>().HasData(lubimiePsheki, prosrali, boogie, billieBoys, nashi);
 
-        ;
-
         modelBuilder.Entity<Game>().HasData(
             new Game() { Id = 1, Title = "Cyberpunk 2077", DeveloperId = 1, PublisherId = 1 },
             new Game() { Id = 2, Title = "Metal Gear Solid", DeveloperId = 2, PublisherId = 2 },
