@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Dtos;
+using Api.Groups;
 using Api.Models.Enums;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,7 @@ public static class PatientsGroup
 {
     public static RouteGroupBuilder MapPatients(this RouteGroupBuilder group)
     {
-        group.AddEndpointFilter(async (invocationContext, next) => {
-            var identity = invocationContext.HttpContext.User.Identity;
-
-            return identity is null 
-                ? Results.Unauthorized() 
-                : await next(invocationContext);
-        });
+        group.AddEndpointFilter<AuthEndpointFilter>();
         
         group.AddEndpointFilter(async (invocationContext, next) => {
             var role = invocationContext.HttpContext.User
@@ -54,7 +49,6 @@ public static class PatientsGroup
         var patients = await patientRepository
             .GetPatientsByDoctorAsync(userName);
         await context.Response.WriteAsJsonAsync(patients);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 
     private static async Task GetPatientVisits(
@@ -72,7 +66,6 @@ public static class PatientsGroup
         }
 
         await context.Response.WriteAsJsonAsync(visits);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
     
     private static async Task AcceptVisit(
@@ -100,6 +93,5 @@ public static class PatientsGroup
         visit.IsSuccessful = true;
         visit.Finding = dto.Finding;
         visitRepository.UpdateVisit(visit);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 }

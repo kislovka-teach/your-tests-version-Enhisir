@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Dtos;
+using Api.Groups;
 using Api.Models;
 using Api.Models.Enums;
 using Api.Services;
@@ -11,13 +12,7 @@ public static class DoctorsGroup
 {
     public static RouteGroupBuilder MapDoctors(this RouteGroupBuilder group)
     {
-        group.AddEndpointFilter(async (invocationContext, next) => {
-            var identity = invocationContext.HttpContext.User.Identity;
-
-            return identity is null 
-                ? Results.Unauthorized() 
-                : await next(invocationContext);
-        });
+        group.AddEndpointFilter<AuthEndpointFilter>();
         
         group.AddEndpointFilter(async (invocationContext, next) => {
             var role = invocationContext.HttpContext.User
@@ -51,7 +46,6 @@ public static class DoctorsGroup
             .GetVisitsByPatientAsync(userName);
         
         await context.Response.WriteAsJsonAsync(visits);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
 
     private static async Task GetDoctors(
@@ -70,7 +64,6 @@ public static class DoctorsGroup
             .GetDoctorsAsync(specialization);
         
         await context.Response.WriteAsJsonAsync(patients);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
     
     private static async Task GetConcreteDoctor(
@@ -87,7 +80,6 @@ public static class DoctorsGroup
         }
         
         await context.Response.WriteAsJsonAsync(doctor);
-        context.Response.StatusCode = StatusCodes.Status200OK;
     }
     
     private static async Task AddVisit(
@@ -115,6 +107,5 @@ public static class DoctorsGroup
             Date = dto.Date
         };
         visitRepository.AddVisit(visit);
-        context.Response.StatusCode = StatusCodes.Status201Created;
     }
 }
