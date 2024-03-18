@@ -24,8 +24,8 @@ public sealed class ApplicationContext : DbContext
         modelBuilder
             .Entity<Visit>()
             .HasOne<Patient>()
-            .WithMany()
-            .HasForeignKey(v => v.PatientId);
+            .WithMany(e => e.Visits)
+            .HasForeignKey(v => v.PatientUserName);
 
         var passwordHasher = new PasswordHasherService();
         modelBuilder
@@ -64,9 +64,10 @@ public sealed class ApplicationContext : DbContext
             new Visit()
             {
                 Id = 1, 
-                PatientId = "enhisir", 
-                DoctorId = "bold", 
+                PatientUserName = "enhisir",
+                DoctorUserName = "bold", 
                 Date = DateTime.Today.ToUniversalTime(), 
+                IsSuccessful = true,
                 Finding = "pomer..."
             }
         );

@@ -40,7 +40,7 @@ public static class DoctorsGroup
         IVisitRepository visitRepository)
     {
         var userName = context.User
-            .FindFirst(ClaimTypes.Role)!.Value;
+            .FindFirst(ClaimTypes.Name)!.Value;
 
         var visits = await visitRepository
             .GetVisitsByPatientAsync(userName);
@@ -102,7 +102,7 @@ public static class DoctorsGroup
 
         var visit = new Visit()
         {
-            PatientId = userName,
+            PatientUserName = userName,
             Doctor = doctor,
             Date = dto.Date
         };

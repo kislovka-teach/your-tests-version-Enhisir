@@ -21,6 +21,7 @@ builder.Services
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = "/login");
+builder.Services.AddAuthorization();
 
 // настраиваем маппер
 builder.Services.AddAutoMapper(

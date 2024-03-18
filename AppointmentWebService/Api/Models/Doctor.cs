@@ -8,6 +8,4 @@ public class Doctor : User
     
     public int SpecializationId { get; set; }
     public Specialization Specialization { get; set; } = null!;
-    
-    public List<Patient> Patients { get; set; }
 }

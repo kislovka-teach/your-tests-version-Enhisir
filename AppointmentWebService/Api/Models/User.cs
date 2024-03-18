@@ -12,4 +12,5 @@ public class User
     public string Surname { get; set; }
     
     public Role Role { get; set; }
+    
 }

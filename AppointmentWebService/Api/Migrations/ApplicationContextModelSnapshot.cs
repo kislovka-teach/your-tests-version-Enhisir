@@ -91,7 +91,7 @@ namespace Api.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DoctorId")
+                    b.Property<string>("DoctorUserName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -102,11 +102,8 @@ namespace Api.Migrations
                     b.Property<bool>("IsSuccessful")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PatientId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("PatientUserName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PatientUserName1")
@@ -114,9 +111,7 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId");
-
-                    b.HasIndex("PatientId");
+                    b.HasIndex("DoctorUserName");
 
                     b.HasIndex("PatientUserName");
 
@@ -129,10 +124,10 @@ namespace Api.Migrations
                         {
                             Id = 1,
                             Date = new DateTime(2024, 3, 18, 21, 0, 0, 0, DateTimeKind.Utc),
-                            DoctorId = "bold",
+                            DoctorUserName = "bold",
                             Finding = "pomer...",
-                            IsSuccessful = false,
-                            PatientId = "enhisir"
+                            IsSuccessful = true,
+                            PatientUserName = "enhisir"
                         });
                 });
 
@@ -152,7 +147,7 @@ namespace Api.Migrations
                         {
                             UserName = "bold",
                             Name = "Johnny",
-                            PasswordHashed = "hZb4TdtcNFljt1J3QhimHA==;5D30Y8voGyIgTATupppg6i9moLRaJCl7LAqnPzH4Tig=",
+                            PasswordHashed = "BkzkmI4A3hFvbaqygoUp3A==;nb5zeL+pk5DcHH1ZHeRAs8uQRhS0m3Lej76miizLckw=",
                             Role = 0,
                             Surname = "Sins",
                             SpecializationId = 1
@@ -163,11 +158,6 @@ namespace Api.Migrations
                 {
                     b.HasBaseType("Api.Models.User");
 
-                    b.Property<string>("DoctorUserName")
-                        .HasColumnType("text");
-
-                    b.HasIndex("DoctorUserName");
-
                     b.HasDiscriminator().HasValue("Patient");
 
                     b.HasData(
@@ -175,7 +165,7 @@ namespace Api.Migrations
                         {
                             UserName = "enhisir",
                             Name = "m",
-                            PasswordHashed = "1Clhv36s1z/x1O5WSV/ewQ==;BbdPxGKK4VXjTchKMgmW4FFQlhuL8Nr1fQBEKp56j54=",
+                            PasswordHashed = "kMauyjlmyQ21EU74zgh5Xw==;RUcTLejCWX9IQrnQE8Dwbc9VMzeOB5QwKNnv8EJP3+A=",
                             Role = 0,
                             Surname = "s"
                         },
@@ -183,7 +173,7 @@ namespace Api.Migrations
                         {
                             UserName = "nikoimam",
                             Name = "n",
-                            PasswordHashed = "EmEggxeYaYzU0qMrEUgSuQ==;FV44VkfhLoZ2nCn/J5CNMka2oC9xqjmB0H5tJWIAwZg=",
+                            PasswordHashed = "OkabuTLPhHUMoauV+EHsrA==;om6GF8jrbZz87b1c3WEqRRCkoni/XJOEJLSeFn2ng6o=",
                             Role = 0,
                             Surname = "i"
                         });
@@ -193,22 +183,18 @@ namespace Api.Migrations
                 {
                     b.HasOne("Api.Models.Doctor", "Doctor")
                         .WithMany()
-                        .HasForeignKey("DoctorId")
+                        .HasForeignKey("DoctorUserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Api.Models.Patient", null)
-                        .WithMany()
-                        .HasForeignKey("PatientId")
+                        .WithMany("Visits")
+                        .HasForeignKey("PatientUserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Api.Models.Doctor", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientUserName");
-
-                    b.HasOne("Api.Models.Patient", null)
-                        .WithMany("Visits")
                         .HasForeignKey("PatientUserName1");
 
                     b.Navigation("Doctor");
@@ -225,18 +211,6 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Specialization");
-                });
-
-            modelBuilder.Entity("Api.Models.Patient", b =>
-                {
-                    b.HasOne("Api.Models.Doctor", null)
-                        .WithMany("Patients")
-                        .HasForeignKey("DoctorUserName");
-                });
-
-            modelBuilder.Entity("Api.Models.Doctor", b =>
-                {
-                    b.Navigation("Patients");
                 });
 
             modelBuilder.Entity("Api.Models.Patient", b =>

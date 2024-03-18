@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20240316150926_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240318221241_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,19 +24,6 @@ namespace Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Api.Models.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Mark")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Reviews");
-                });
 
             modelBuilder.Entity("Api.Models.Specialization", b =>
                 {
@@ -53,24 +40,24 @@ namespace Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Specializations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Handsome master"
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)");
-
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -87,7 +74,7 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserName");
 
                     b.ToTable("Users");
 
@@ -107,27 +94,49 @@ namespace Api.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("integer");
+                    b.Property<string>("DoctorUserName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("PatientId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Finding")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PatientUserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PatientUserName1")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoctorId");
+                    b.HasIndex("DoctorUserName");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("PatientUserName");
 
-                    b.ToTable("Appointments");
+                    b.HasIndex("PatientUserName1");
+
+                    b.ToTable("Visits");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2024, 3, 18, 21, 0, 0, 0, DateTimeKind.Utc),
+                            DoctorUserName = "bold",
+                            Finding = "pomer...",
+                            IsSuccessful = true,
+                            PatientUserName = "enhisir"
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.Doctor", b =>
                 {
                     b.HasBaseType("Api.Models.User");
-
-                    b.Property<double>("Rating")
-                        .HasColumnType("double precision");
 
                     b.Property<int>("SpecializationId")
                         .HasColumnType("integer");
@@ -135,6 +144,17 @@ namespace Api.Migrations
                     b.HasIndex("SpecializationId");
 
                     b.HasDiscriminator().HasValue("Doctor");
+
+                    b.HasData(
+                        new
+                        {
+                            UserName = "bold",
+                            Name = "Johnny",
+                            PasswordHashed = "BkzkmI4A3hFvbaqygoUp3A==;nb5zeL+pk5DcHH1ZHeRAs8uQRhS0m3Lej76miizLckw=",
+                            Role = 0,
+                            Surname = "Sins",
+                            SpecializationId = 1
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.Patient", b =>
@@ -142,32 +162,43 @@ namespace Api.Migrations
                     b.HasBaseType("Api.Models.User");
 
                     b.HasDiscriminator().HasValue("Patient");
-                });
 
-            modelBuilder.Entity("Api.Models.Review", b =>
-                {
-                    b.HasOne("Api.Models.Visit", "Visit")
-                        .WithOne("Review")
-                        .HasForeignKey("Api.Models.Review", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Visit");
+                    b.HasData(
+                        new
+                        {
+                            UserName = "enhisir",
+                            Name = "m",
+                            PasswordHashed = "kMauyjlmyQ21EU74zgh5Xw==;RUcTLejCWX9IQrnQE8Dwbc9VMzeOB5QwKNnv8EJP3+A=",
+                            Role = 0,
+                            Surname = "s"
+                        },
+                        new
+                        {
+                            UserName = "nikoimam",
+                            Name = "n",
+                            PasswordHashed = "OkabuTLPhHUMoauV+EHsrA==;om6GF8jrbZz87b1c3WEqRRCkoni/XJOEJLSeFn2ng6o=",
+                            Role = 0,
+                            Surname = "i"
+                        });
                 });
 
             modelBuilder.Entity("Api.Models.Visit", b =>
                 {
                     b.HasOne("Api.Models.Doctor", "Doctor")
                         .WithMany()
-                        .HasForeignKey("DoctorId")
+                        .HasForeignKey("DoctorUserName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Models.Patient", null)
+                        .WithMany("Visits")
+                        .HasForeignKey("PatientUserName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Api.Models.Doctor", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PatientUserName1");
 
                     b.Navigation("Doctor");
 
@@ -185,9 +216,9 @@ namespace Api.Migrations
                     b.Navigation("Specialization");
                 });
 
-            modelBuilder.Entity("Api.Models.Visit", b =>
+            modelBuilder.Entity("Api.Models.Patient", b =>
                 {
-                    b.Navigation("Review");
+                    b.Navigation("Visits");
                 });
 #pragma warning restore 612, 618
         }

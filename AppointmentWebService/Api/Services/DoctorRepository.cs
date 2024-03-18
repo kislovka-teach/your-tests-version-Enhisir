@@ -15,15 +15,9 @@ public class DoctorRepository(ApplicationContext dbContext) : IDoctorRepository
     }
 
     public async Task<Doctor?> GetConcreteDoctorAsync(
-        string username, 
-        bool withPatients = false)
+        string username)
     {
         var query = dbContext.Doctors.AsQueryable();
-        
-        if (withPatients)
-        {
-            query = query.Include(d => d.Patients);
-        }
         
         return await query
             .SingleOrDefaultAsync(d => username.Equals(d.UserName));

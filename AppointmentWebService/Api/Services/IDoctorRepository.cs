@@ -5,5 +5,5 @@ namespace Api.Services;
 public interface IDoctorRepository
 {
     public Task<List<Doctor>> GetDoctorsAsync(Specialization? specialization = null);
-    public Task<Doctor?> GetConcreteDoctorAsync(string username, bool withPatients = false);
+    public Task<Doctor?> GetConcreteDoctorAsync(string username);
 }

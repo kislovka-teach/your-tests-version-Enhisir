@@ -26,9 +26,10 @@ public static class AuthGroup
         IPasswordHasherService passwordHasherService)
     {
         var user = await userService.GetUserByUserNameAsync(dto.UserName);
-        if (passwordHasherService.Validate(user.PasswordHashed, dto.Password))
+        if (user is not null 
+            && passwordHasherService.Validate(user.PasswordHashed, dto.Password))
         {
-            var usernameClaim = new Claim(ClaimTypes.Name, user.Name);
+            var usernameClaim = new Claim(ClaimTypes.Name, user.UserName);
             var roleClaim = new Claim(ClaimTypes.Role, user.Role.ToString());
 
             var userIdentity = new ClaimsIdentity(
